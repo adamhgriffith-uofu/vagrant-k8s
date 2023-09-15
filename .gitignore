@@ -1,0 +1,7 @@
+
+
+# Vagrant Meta
+.vagrant
+
+# Local Files
+settings*.yml

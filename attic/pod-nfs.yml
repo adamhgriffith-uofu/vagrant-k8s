@@ -1,0 +1,42 @@
+---
+
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pvc-nfs-chpc-cm
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: nfs-chpc-cm
+
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nfs-driver-test
+  namespace: default
+  labels:
+    run: busybox
+spec:
+  securityContext:
+    runAsUser: 1553048 # u6040124
+    runAsGroup: 1722 # chpc
+  containers:
+  - name: busybox
+    image: busybox
+    command: [ "sh", "-c", "sleep 1h" ]
+    volumeMounts:
+    - name: nfs-vol
+      mountPath: /mnt/nfs
+      readOnly: false
+    securityContext:
+      allowPrivilegeEscalation: false
+  volumes:
+  - name: nfs-vol
+    persistentVolumeClaim:
+      claimName: pvc-nfs-chpc-cm

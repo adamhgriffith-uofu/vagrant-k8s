@@ -1,0 +1,48 @@
+---
+
+# Docs
+#
+# https://github.com/kubernetes-csi/csi-driver-smb/tree/master
+#
+
+
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pvc-smb-test
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: smb-test
+
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: smb-test
+  namespace: default
+  labels:
+    run: busybox
+spec:
+  securityContext:
+    runAsUser: 1553048 # u6040124
+    runAsGroup: 1722 # chpc
+  containers:
+  - name: busybox
+    image: busybox
+    command: [ "sh", "-c", "sleep 1h" ]
+    volumeMounts:
+    - name: smb-vol
+      mountPath: /mnt/smb
+      readOnly: false
+    securityContext:
+      allowPrivilegeEscalation: false
+  volumes:
+  - name: smb-vol
+    persistentVolumeClaim:
+      claimName: pvc-smb-test

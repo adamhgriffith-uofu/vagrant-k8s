@@ -1,9 +1,0 @@
----
-- hosts: all
-  become: yes
-
-  tasks:
-    - name: hello world
-      shell: echo 'hello world'
-      failed_when: no
-      changed_when: no

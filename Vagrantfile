@@ -25,7 +25,8 @@ ENV['KUBE_CLUSTER_POD_CIDR'] = '172.16.1.0/16'
 ENV['KUBE_CLUSTER_SVC_CIDR'] = '172.17.1.0/18'
 ENV['KUBE_VERSION'] = '1.31'
 ENV['VAGRANT_BOX'] = 'rockylinux/9'
-ENV['VAGRANT_BOX_VERSION'] = '4.0.0'
+# ENV['VAGRANT_BOX_VERSION'] = '4.0.0'
+ENV['VAGRANT_BOX_VERSION'] = '0'
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for

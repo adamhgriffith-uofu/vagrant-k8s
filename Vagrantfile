@@ -1,7 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-Vagrant.require_version ">= 2.4.0"
+Vagrant.require_version ">= 2.3.0"
 
 # Load Ruby Gems:
 require 'yaml'
@@ -25,7 +25,7 @@ ENV['KUBE_CLUSTER_POD_CIDR'] = '172.16.1.0/16'
 ENV['KUBE_CLUSTER_SVC_CIDR'] = '172.17.1.0/18'
 ENV['KUBE_VERSION'] = '1.31'
 ENV['VAGRANT_BOX'] = 'rockylinux/9'
-# ENV['VAGRANT_BOX_VERSION'] = '4.0.0'
+# ENV['VAGRANT_BOX_VERSION'] = '5.0.0'
 ENV['VAGRANT_BOX_VERSION'] = '0'
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
@@ -60,7 +60,11 @@ Vagrant.configure("2") do |config|
       node.vm.box = ENV['VAGRANT_BOX']
       node.vm.box_version = ENV['VAGRANT_BOX_VERSION']
       node.vm.hostname = server['name']
-      node.vm.network "private_network", ip: server['ipv4']
+      node.vm.network "private_network",
+        ip: server['ipv4']
+        # libvirt__netmask: '255.255.255.0',
+        # libvirt__network_name: 'default',
+        # libvirt__forward_mode: 'none' 
 
       # VirtualBox provider
       node.vm.provider "virtualbox" do |vb|
@@ -71,6 +75,34 @@ Vagrant.configure("2") do |config|
         vb.name = server['name']
         vb.customize ["modifyvm", :id, "--groups", ("/" + ENV['KUBE_CLUSTER_NAME'])]
       end
+
+      # Libvirt provider
+      node.vm.provider "libvirt" do |lv|
+        # Use QEMU session instead of system connection
+        lv.qemu_use_session = true
+        # URI of QEMU session connection
+        lv.uri = 'qemu:///session'
+        # URI of QEMU system connection, use to obtain IP address for management
+        lv.system_uri = 'qemu:///system'
+        # Path to store Libvirt images for the virtual machine
+        lv.storage_pool_path = '~/.local/share/libvirt/images'
+        # Management network device, default is below
+        lv.management_network_device = 'virbr0'
+
+        lv.memory = server['memory']
+        lv.cpus = server['cpus']
+        lv.default_prefix = ENV['KUBE_CLUSTER_NAME']
+      end
+
+      # # Libvirt provider
+      # node.vm.provider "libvirt" do |lv|
+      #   lv.qemu_use_session = true
+      #   lv.nested = false
+      #   lv.cpu_mode = "host-model"
+      #   lv.memory = server['memory']
+      #   lv.cpus = server['cpus']
+      #   lv.default_prefix = ENV['KUBE_CLUSTER_NAME']
+      # end
 
       # Base node installation
       node.vm.provision "shell" do |script|
@@ -140,7 +172,11 @@ Vagrant.configure("2") do |config|
       node.vm.box = ENV['VAGRANT_BOX']
       node.vm.box_version = ENV['VAGRANT_BOX_VERSION']
       node.vm.hostname = server['name']
-      node.vm.network "private_network", ip: server['ipv4']
+      node.vm.network "private_network",
+        ip: server['ipv4'],
+        libvirt__netmask: '255.255.255.0',
+        libvirt__network_name: 'default',
+        libvirt__forward_mode: 'none'
 
       # VirtualBox provider
       node.vm.provider "virtualbox" do |vb|
@@ -150,6 +186,15 @@ Vagrant.configure("2") do |config|
         vb.memory = server['memory']
         vb.name = server['name']
         vb.customize ["modifyvm", :id, "--groups", ("/" + ENV['KUBE_CLUSTER_NAME'])]
+      end
+
+      # Libvirt provider
+      node.vm.provider "libvirt" do |lv|
+        lv.nested = false
+        lv.cpu_mode = "host-model"
+        lv.memory = server['memory']
+        lv.cpus = server['cpus']
+        lv.default_prefix = ENV['KUBE_CLUSTER_NAME']
       end
 
       # Base node installation

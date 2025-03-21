@@ -11,6 +11,11 @@ $ wget https://dl.rockylinux.org/vault/rocky/9.4/images/x86_64/Rocky-9-Vagrant-V
 $ vagrant box add --architecture amd64 --provider virtualbox --name rockylinux/9 Rocky-9-Vagrant-Vbox-9.4-20240509.0.x86_64.box
 ```
 
+```console
+$ wget https://dl.rockylinux.org/vault/rocky/9.5/images/x86_64/Rocky-9-Vagrant-Libvirt-9.5-20241118.0.x86_64.box -O Rocky-9-Vagrant-Libvirt-9.5-20241118.0.x86_64.box
+$ vagrant box add --provider libvirt --name rockylinux/9 Rocky-9-Vagrant-Libvirt-9.5-20241118.0.x86_64.box
+```
+
 Additionally the version constraint in the `Vagrantfile` must be commented out for now since constraints are only supported by boxes from Vagrant Cloud or a custom box host, not a direct download such as this.
 
 ## Additional Resources
